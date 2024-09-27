@@ -1,0 +1,156 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@700&display=swap');
+
+.game-container {
+    padding: 50px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.question-box {
+    background-color: #ffc107;
+    padding: 20px;
+    text-align: center;
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 30px;
+    border-radius: 10px;
+}
+
+.answer-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+}
+
+.answer-box {
+    background-color: #007bff;
+    color: #fff;
+    width: 45%;
+    padding: 15px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.answer-box:hover {
+    background-color: #0056b3;
+}
+
+.scoreboard {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+}
+
+.team-score {
+    text-align: center;
+    background-color: #28a745;
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 20px;
+}
+
+.team-score h2 {
+    margin-bottom: 10px;
+}
+
+.neon-header {
+    font-size: 5rem;
+    color: #fff;
+    text-shadow: 
+        0 0 5px #ffff00,
+        0 0 10px #ffff00,
+        0 0 20px #ffff00,
+        0 0 40px #ffff00,
+        0 0 80px #ffff00;
+    font-family: 'Arial', sans-serif;
+    letter-spacing: 0.1em;
+}
+
+/* Glow effect for the neon header */
+.neon-header:hover {
+    text-shadow: 
+        0 0 10px #00e6ff,
+        0 0 20px #00e6ff,
+        0 0 30px #00e6ff,
+        0 0 50px #00e6ff,
+        0 0 100px #00e6ff;
+}
+
+.neon-text {
+    display: flex;
+    justify-content: center;  /* Horizontally center the text */
+    align-items: center;      /* Vertically center the text */
+    font-size: 72px; /* Adjust the font size as needed */
+    color: #ffff00; /* Neon yellow color */
+    text-transform: uppercase;
+    letter-spacing: 10px;
+    animation: neonGlow 2s ease-in-out infinite alternate; /* Glow animation */
+    text-shadow:
+      0 0 5px #ffff00,
+      0 0 10px #ffff00,
+      0 0 20px #ffff00,
+      0 0 40px #ffff00,
+      0 0 80px #ffff00,
+      0 0 120px #ffff00;
+}
+
+@keyframes neonGlow {
+    0% {
+        text-shadow: 
+          0 0 5px #ffff00,
+          0 0 10px #ffff00,
+          0 0 20px #ffff00,
+          0 0 40px #ffff00,
+          0 0 80px #ffff00,
+          0 0 120px #ffff00;
+    }
+    100% {
+        text-shadow: 
+          0 0 10px #ffff00,
+          0 0 20px #ffff00,
+          0 0 30px #ffff00,
+          0 0 50px #ffff00,
+          0 0 100px #ffff00,
+          0 0 150px #ffff00;
+    }
+}
+
+.glowing-border {
+    border: 3px solid transparent;
+    border-radius: 15px;
+    z-index: 1;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.8),
+                0 0 40px rgba(0, 255, 255, 0.6),
+                0 0 60px rgba(0, 255, 255, 0.4);
+    animation: border-glow 3s linear infinite;
+}
+
+@keyframes border-glow {
+    0% {
+        border-color: #00ffff;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.8),
+                    0 0 20px rgba(0, 255, 255, 0.6),
+                    0 0 40px rgba(0, 255, 255, 0.4),
+                    0 0 80px rgba(0, 255, 255, 0.2);
+    }
+    50% {
+        border-color: #ff00ff;
+        box-shadow: 0 0 10px rgba(255, 0, 255, 0.8),
+                    0 0 20px rgba(255, 0, 255, 0.6),
+                    0 0 40px rgba(255, 0, 255, 0.4),
+                    0 0 80px rgba(255, 0, 255, 0.2);
+    }
+    100% {
+        border-color: #00ffff;
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.8),
+                    0 0 20px rgba(0, 255, 255, 0.6),
+                    0 0 40px rgba(0, 255, 255, 0.4),
+                    0 0 80px rgba(0, 255, 255, 0.2);
+    }
+}

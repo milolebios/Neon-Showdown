@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>NEON SHOWDOWN</title>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+		<link href="/css/play2.css" rel="stylesheet">
+		<link href="/css/ananya_neogi.css" rel="stylesheet">
+		<link href="/css/parallax_stars.css" rel="stylesheet">
+	</head>
+	<body>
+		<div id="stars"></div>
+		<div id="stars2"></div>
+		<div id="stars3"></div>
+		<div class="horizontal-scroll" id="app" v-cloak>
+			<audio ref="wrongAnswerAudio" src="/audio/system/buzzer_wrong.mp3"></audio>
+			<div class="notification-overlay" v-if="showX">
+				<img src="/images/system/x.gif" alt="Notification" />
+			</div>
+			<section class="full-screen" ref="welcomeSection">
+				<h1 class="ananya-neogi-text">NEON SHOWDOWN</h1>
+			</section>
+			<section
+				class="full-screen"
+				v-for="(question, index) in questions"
+				:key="index"
+				:ref="'question' + index"
+			>
+				<div class="row justify-content-center">
+					<div class="question-box col-lg-11">
+						<h3 style="letter-spacing: 2px;" v-if="question.show">Question {{ index + 1 }}/{{ questions.length }} : {{ question['question'] }}</h3>
+						<h3 style="letter-spacing: 3px;"  v-else="question.show">Question {{ index + 1 }}/4 : {{ convertToUnderscores(question['question']) }}</h3>
+					</div>
+					<div class="answer-grid mt-2 row col-lg-12 justify-content-center">
+						<div class="answer-box col-lg-5 col-md-5 ml-4" v-for="(answer, index) in question['answers']" :key="index" :ref="'answerBox' + index">
+							<h4 style="letter-spacing: 2px;" v-if="answer.show" class="d-flex justify-content-between align-items-center">
+								{{ answer.text }}
+								<span class="badge bg-danger rounded-pill">{{ answer.points }}</span>
+							</h4>
+							<h4 style="letter-spacing: 3px;" v-else class="d-flex justify-content-between align-items-center">
+								{{ convertToUnderscores(answer.text) }}
+								<span class="badge bg-danger rounded-pill">{{ answer.points }}</span>
+							</h4>
+						</div>
+					</div>
+				</div>
+			</section>
+			<section class="full-screen-result" ref="resultSection">
+				<h1 class="ananya-neogi-text mt-5">Result</h1>
+				<div class="row justify-content-center">
+					<div class="col-lg-7 mt-4 d-flex align-items-center result-item">
+						<h1>RANK</h1>
+						<h1>TEAM</h1> 
+						<h1>POINTS</h1> 
+					</div>
+					<div :key="0"  v-if="getRankedGroups()[0].visible" class="col-lg-7 mt-4 d-flex align-items-center result-item">
+						<span class="circle" style="width: 70px;"><h1>1</h1></span> 
+						<h1 :class="getRankedGroups()[0].class">{{ getRankedGroups()[0].name }}</h1> 
+						<h1>{{ getRankedGroups()[0].totalPoints }}</h1> 
+					</div>
+					<div :key="1" v-if="getRankedGroups()[1].visible" class="col-lg-7 mt-4 d-flex align-items-center result-item">
+						<span class="circle" style="width: 70px;"><h1>2</h1></span> 
+						<h1 :class="getRankedGroups()[1].class">{{ getRankedGroups()[1].name }}</h1> 
+						<h1>{{ getRankedGroups()[1].totalPoints }}</h1> 
+					</div>
+					<div v-for="(group, index) in getRankedGroups().slice(2)" :key="index"  v-if="group.visible" class="col-lg-7 mt-4 d-flex align-items-center result-item">
+						<span class="circle" style="width: 40px;"><h3>{{ index + 3 }}</h3></span> 
+						<h3 :class="group.class">{{ group.name }}</h3> 
+						<h3>{{ group.totalPoints }}</h3> 
+					</div>
+				</div>
+			</section>
+			</section>
+			<div class="fixed-group" ref="fixedGroup" v-show="showGroup">
+				<div v-for="(group, index) in groups" :key="index" :class="['team', { 'glowing-border': group.active }]"  v-if="group.visible" :ref="'groupElement' + index">
+					<h2 :class="group.class">{{ group.name }}</h2>
+					<h1 ref="scoreElement">{{ getGroupTotalPoints(index, questions) }}</h1>
+				</div>
+			</div>
+		</div>
+		<script src="/js/anime.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+		<script src="/socket.io/socket.io.js"></script>
+			<script>
+				// Vue.js instance
+				var app = new Vue({
+					el: '#app',
+					data: {
+						questions: [],
+						groups: [],
+						activeQuestionIndex: 0,
+						socket: null,
+						showGroup: false,
+						showX: false
+					},
+					beforeMount() {
+						this.socket = io();
+						this.socket.on('json-data', (data) => {
+							this.activeQuestionIndex = data['active_question_index'];
+							this.questions = data['questions'];
+							this.groups = data['groups'];
+						});
+						this.socket.on('updated-question-index', (updatedActiveQuestionIndex) => {
+							this.activeQuestionIndex = updatedActiveQuestionIndex;
+						});
+						this.socket.on('updated-answers', (updatedData) => {
+							this.questions[this.activeQuestionIndex]['show'] = updatedData.questions[this.activeQuestionIndex]['show'];
+							this.questions[this.activeQuestionIndex]['answers'].forEach((answer, index) => {
+								if (
+									answer.show !== updatedData.questions[this.activeQuestionIndex]['answers'][index].show ||
+									answer.lock !== updatedData.questions[this.activeQuestionIndex]['answers'][index].lock ||
+									answer.group !== updatedData.questions[this.activeQuestionIndex]['answers'][index].group
+
+								) {
+									const answerBox = this.$refs[`answerBox${index}`];
+									anime({
+											targets: answerBox,
+											scale: [1, 1.2, 1],	
+											duration: 1500,
+											easing: 'easeInOutQuad',
+											complete: () => {
+												answer.show =  updatedData.questions[this.activeQuestionIndex]['answers'][index].show;
+												answer.lock =  updatedData.questions[this.activeQuestionIndex]['answers'][index].lock;
+												answer.group =  updatedData.questions[this.activeQuestionIndex]['answers'][index].group;
+												answer.active =  updatedData.questions[this.activeQuestionIndex]['answers'][index].active;
+											}
+									});
+								}
+							});
+							this.groups.forEach((group, index) => {
+								const beforePoints = this.getGroupTotalPoints(index, this.questions);
+								const afterPoints = this.getGroupTotalPoints(index, updatedData.questions);
+								if(afterPoints !== beforePoints) {
+									this.animateNumber(index, beforePoints, afterPoints);
+								}
+							});
+						});
+						this.socket.on('updated-groups', (updatedData) => {
+							this.groups = updatedData.groups;
+						});
+						this.socket.on('display-found-nothing', () => {
+							this.$refs.wrongAnswerAudio.play();
+							this.showNotification();
+						});
+					},
+					mounted() {
+						this.scrollToQuestion(this.activeQuestionIndex);
+					},
+					methods: {
+						scrollToQuestion(questionIndex) {
+							setTimeout(() => {
+								if (questionIndex === 9998) {
+									const questionRef = this.$refs.welcomeSection;
+									if (questionRef) {
+											questionRef.scrollIntoView({ behavior: 'smooth' });
+											this.toggleGroupHidden();
+									}
+								} else if (questionIndex === 9999) {
+									this.socket.emit('request-updated-data');
+									const questionRef = this.$refs.resultSection;
+									if (questionRef) {
+											questionRef.scrollIntoView({ behavior: 'smooth' });
+											this.toggleGroupHidden();
+									}
+								} else {
+									const questionRef = this.$refs['question' + questionIndex];
+									if (questionRef && questionRef[0]) {
+											questionRef[0].scrollIntoView({ behavior: 'smooth' });
+											this.toggleGroupVisible();
+									}
+								}
+							}, 500);
+						},
+						toggleGroupVisible() {
+							const fixedGroup = this.$refs.fixedGroup;
+							fixedGroup.style.removeProperty('top');
+							if (!this.showGroup) {
+								this.showGroup = true; 
+								anime({
+									targets: fixedGroup,
+									translateY: [100, 0],
+									opacity: [0, 1],
+									duration: 1000,
+									easing: 'easeInOutQuad'
+								});
+							}
+						},
+						toggleGroupHidden() {
+							const fixedGroup = this.$refs.fixedGroup;
+							fixedGroup.style.removeProperty('top');
+							if (this.showGroup) {
+								anime({
+									targets: fixedGroup,
+									translateY: [0, 100],
+									opacity: [1, 0],
+									duration: 1000,
+									easing: 'easeInOutQuad',
+									complete: () => {
+											this.showGroup = false; 
+									}
+								});
+							}
+						},
+						animateNumber(groupIndex, NumberFrom, numberTo) {
+							anime({
+								targets: this.$refs.scoreElement[groupIndex],
+								innerHTML: [NumberFrom, numberTo],
+								round: 1,
+								easing: 'easeInOutExpo',
+								duration: 5000,
+							});
+						},
+						toggleGroupResultVisible() {
+							const fixedGroup = this.$refs.fixedGroup;
+							console.log(fixedGroup);
+								this.showGroup = true;
+								fixedGroup.style.top = 0;
+								anime({
+									targets: fixedGroup,
+									translateY: [1000, 0],
+									opacity: [1, 1],
+									duration: 1000,
+									easing: 'easeInOutQuad',
+									complete: () => {
+										this.groups.forEach((group, index) => {
+											const groupElement = this.$refs['groupElement' + index];
+											console.log(groupElement[0])
+										});
+									}
+								});
+						},
+						convertToUnderscores(inputString) {
+							const characters = inputString.split('');
+
+							const underscoreString = characters.map(char => {
+									return char === ' ' ? ' ' : '_';
+							}).join('');
+
+							return underscoreString;
+						},
+						getGroupTotalPoints(groupIndex, questions) {
+							let totalPoints = 0;
+							questions.forEach(question => {
+									question.answers.forEach(answer => {
+											if (answer.lock && answer.group === groupIndex) {
+													totalPoints += answer.points;
+											}
+									});
+							});
+
+							return totalPoints;
+						},
+						getRankedGroups() {
+							// Create an array of groups with their total points
+							const groupsWithPoints = this.groups.map((group, index) => ({
+									...group,
+									totalPoints: this.getGroupTotalPoints(index, this.questions)
+							}));
+
+							// Sort the groups by total points in descending order
+							return groupsWithPoints.sort((a, b) => b.totalPoints - a.totalPoints);
+						},
+						showNotification() {
+							this.showX = true;
+							setTimeout(() => {
+								this.showX = false;
+							}, 500);
+						}
+					},
+					watch: {
+						activeQuestionIndex(newIndex) {
+							this.scrollToQuestion(newIndex);
+						}
+					}
+				});
+		</script>
+	</body>
+</html>

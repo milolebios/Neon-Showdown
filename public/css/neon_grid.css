@@ -1,0 +1,48 @@
+body {
+  margin: 0;
+  height: 100vh;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.grid {
+  position: relative;
+  width: 200vw; /* Extra wide to create movement effect */
+  height: 100vh;
+  transform: perspective(600px) rotateX(60deg);
+}
+
+.line {
+  position: absolute;
+  background: rgba(0, 255, 255, 0.8); /* Neon cyan glow */
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.8), 0 0 20px rgba(0, 255, 255, 0.6);
+}
+
+.horizontal {
+  width: 200%;
+  height: 2px;
+  left: 0;
+}
+
+.vertical {
+  height: 200%;
+  width: 2px;
+  top: 0;
+}
+
+/* Animation for forward movement */
+@keyframes moveGrid {
+  0% {
+    transform: translateZ(0);
+  }
+  100% {
+    transform: translateZ(-1000px); /* Creates the "moving forward" effect */
+  }
+}
+
+.grid-animation {
+  animation: moveGrid 5s linear infinite;
+}

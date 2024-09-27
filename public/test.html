@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Family Feud Game</title>
+  <style>
+    /* Overall body styling */
+    body {
+      background-color: #000;
+      font-family: 'Arial', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      animation: pulse 5s infinite alternate;
+    }
+
+    /* Pulsing background effect */
+    @keyframes pulse {
+      0% {
+        background-color: #000;
+      }
+      50% {
+        background-color: rgba(0, 255, 255, 0.1);
+      }
+      100% {
+        background-color: #000;
+      }
+    }
+
+    /* Neon border effect for the container */
+    .neon-border {
+      box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), 
+                  0 0 60px rgba(0, 255, 255, 0.5), 
+                  0 0 90px rgba(0, 255, 255, 0.5);
+      border-radius: 10px;
+    }
+
+    /* Main game container */
+    .game-container {
+      width: 80%;
+      max-width: 1200px;
+      border: 5px solid #00ffcc;
+      padding: 20px;
+      background: #111;
+      box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Family Feud-style header */
+    .game-header {
+      font-size: 4rem;
+      color: #ff0066;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px #ff0066, 0 0 20px #ff0066, 0 0 40px #ff0066;
+      margin-bottom: 30px;
+    }
+
+    /* Question Box */
+    .question-box {
+      font-size: 2rem;
+      color: #ffcc00;
+      text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00;
+      margin-bottom: 40px;
+      position: relative;
+      overflow: hidden;
+      height: 50px; /* Adjust height to prevent layout shifts */
+    }
+
+    /* Parallax effect for the question text */
+    .question-text {
+      transition: transform 0.5s ease;
+      position: absolute;
+      width: 100%;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    /* Answer Board */
+    .answer-board {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-gap: 15px;
+      margin-bottom: 40px;
+    }
+
+    /* Answer Box (Revealed and Hidden) */
+    .answer-slot {
+      background-color: #222;
+      color: #fff;
+      padding: 15px;
+      font-size: 1.5rem;
+      border: 2px solid #00ffcc;
+      border-radius: 10px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .answer-slot.hidden {
+      background-color: #333;
+      color: transparent;
+      border: 2px solid #00ffff;
+      text-shadow: none;
+    }
+
+    .answer-slot.hidden::before {
+      content: '???';
+      color: #00ffff;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+    }
+
+    /* Scoreboard Styling */
+    .scoreboard {
+      display: flex;
+      justify-content: space-between;
+      padding: 20px;
+      background: #111;
+      border: 2px solid #ff00ff;
+      border-radius: 10px;
+      text-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+      box-shadow: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+      color: #fff;
+    }
+
+    .scoreboard div {
+      font-size: 1.5rem;
+      text-transform: uppercase;
+    }
+
+    /* Button to Reveal Answers */
+    .reveal-btn {
+      background-color: #ff0066;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      text-transform: uppercase;
+      text-shadow: 0 0 10px #ff0066;
+      transition: background-color 0.3s ease;
+    }
+
+    .reveal-btn:hover {
+      background-color: #ff3399;
+    }
+
+    /* Link to change the question */
+    .change-question-link {
+      display: inline-block;
+      margin-top: 20px;
+      color: #00ffcc;
+      text-decoration: underline;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .change-question-link:hover {
+      color: #00ffff;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="game-container neon-border">
+    <!-- Header -->
+    <div class="game-header">Family Feud Neon</div>
+
+    <!-- Question Box -->
+    <div class="question-box">
+      <div class="question-text" id="questionText">Question: Name a fruit that is red.</div>
+    </div>
+
+    <!-- Answer Slots -->
+    <div class="answer-board">
+      <div class="answer-slot" id="answer1">Apple <span class="badge">50</span></div>
+      <div class="answer-slot hidden" id="answer2">Strawberry <span class="badge">30</span></div>
+      <div class="answer-slot hidden" id="answer3">Cherry <span class="badge">20</span></div>
+      <div class="answer-slot hidden" id="answer4">Watermelon <span class="badge">10</span></div>
+    </div>
+
+    <!-- Scoreboard -->
+    <div class="scoreboard">
+      <div>Team 1: 80</div>
+      <div>Team 2: 70</div>
+    </div>
+
+    <!-- Reveal Button -->
+    <button class="reveal-btn" onclick="revealAnswer()">Reveal Answer</button>
+
+    <!-- Change Question Link -->
+    <div class="change-question-link" onclick="changeQuestion()">Change Question</div>
+  </div>
+
+  <script>
+    let revealedAnswers = 1;
+    let currentQuestionIndex = 0;
+
+    // List of questions
+    const questions = [
+      {
+        question: "Name a fruit that is red.",
+        answers: ["Apple", "Strawberry", "Cherry", "Watermelon"]
+      },
+      {
+        question: "Name a popular programming language.",
+        answers: ["JavaScript", "Python", "Java", "C#"]
+      }
+    ];
+
+    function revealAnswer() {
+      if (revealedAnswers <= questions[currentQuestionIndex].answers.length) {
+        document.getElementById(`answer${revealedAnswers}`).classList.remove('hidden');
+        revealedAnswers++;
+      }
+    }
+
+    function changeQuestion() {
+      // Animate the current question out
+      const questionText = document.getElementById('questionText');
+      questionText.style.transform = "translateY(-100%)"; // Move up
+
+      // Change the question after a short delay
+      setTimeout(() => {
+        currentQuestionIndex = (currentQuestionIndex + 1) % questions.length; // Loop through questions
+        questionText.innerHTML = "Question: " + questions[currentQuestionIndex].question;
+        revealedAnswers = 1; // Reset revealed answers
+        document.querySelectorAll('.answer-slot').forEach((slot, index) => {
+          slot.classList.add('hidden'); // Hide all answers
+          if (index < questions[currentQuestionIndex].answers.length) {
+            slot.innerHTML = questions[currentQuestionIndex].answers[index] + ' <span class="badge">' + (Math.floor(Math.random() * 100) + 1) + '</span>'; // Random points for demo
+          }
+        });
+        
+        // Animate the new question in
+        questionText.style.transform = "translateY(0)"; // Move back to center
+      }, 500); // Matches the animation duration
+    }
+  </script>
+
+</body>
+</html>

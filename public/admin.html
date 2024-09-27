@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+  <title>NEON SHOWDOWN - Admin</title>
+</head>
+<body>
+  <div class="container" id="app">
+    <h1>NEON SHOWDOWN (Admin Control Panel)</h1>
+    <hr></hr>
+    <div class="mb-3">
+      <button :disabled="activeQuestionIndex === 9998" @click="gotoQuestion(9998)">Welcome Page</button>
+      <button v-for="(question, index) in questions" class="me-1" :disabled="index === activeQuestionIndex" @click="gotoQuestion(index)">
+        Round {{ index + 1 }}
+      </button>
+      <button :disabled="activeQuestionIndex === 9999" @click="gotoQuestion(9999)">Result</button>
+    </div>
+    <div class="row">
+      <div class="mb-3 col-lg-8" v-if="activeQuestionIndex !== 9999 && activeQuestionIndex !== 9998">
+        <label v-if="questions.length > 0 && activeQuestionIndex < questions.length">
+          Question: {{ questions[activeQuestionIndex]['question'] }} 
+          <button v-if="!questions[activeQuestionIndex]['show']" @click="showQuestion(questions[activeQuestionIndex])">Show</button>
+          <button v-else @click="hideQuestion(questions[activeQuestionIndex])">hide</button>
+        </label>
+      </div>
+      <hr/>
+      <div class="mb-3 col-lg-8" v-if="activeQuestionIndex !== 9999 && activeQuestionIndex !== 9998">
+        <label>Answer</label>
+        <button @click="showAnswer()">Save</button>
+        <button class="me-2" @click="showNoAnswerFound()">Show No Answer Found</button>
+        <table class="table table-bordered table-hover mt-2">
+          <thead>
+            <tr>
+              <th>Pts</td>
+              <th>Name</td>
+              <th>Form  </td>
+              <th>Set</td>
+              <th>InActive</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(answer, index) in questions[activeQuestionIndex]['answers']" :key="index">
+              <td>{{ answer.points }}</td>
+              <td>{{ answer.text }}</td>
+              <td>
+                <div class="form-group row align-items-center mb-1">
+                 <!-- Show Checkbox -->
+                  <div class="col-md-2 text-right">
+                    <label :for="'Show' + index" class="form-check-label mr-2">Show</label>
+                  </div>
+                  <div class="col-md-1">
+                    <input type="checkbox" :id="'Show' + index" v-model="answer.show" class="form-check-input" />
+                  </div>
+                  <div class="col-md-2 text-right">
+                    <label :for="'Lock' + index" class="form-check-label mr-2">Lock</label>
+                  </div>
+                  <div class="col-md-1">
+                    <input type="checkbox" :id="'Lock' + index" v-model="answer.lock" class="form-check-input" />
+                  </div>
+                </div>
+                <div class="form-group row align-items-center mb-1">
+                  <div class="col-md-3">
+                    <label for="groupSelect" class="form-label">Group</label>
+                  </div>
+                  <div class="col-md-9">
+                    <select id="groupSelect" v-model="answer.group" class="form-control">
+                      <option value=""></option>
+                      <option v-for="(group, index) in groups" :key="index" :value="index" v-if="group.visible">
+                        {{ group.name }}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <button :disabled="answer.active" @click="setActive(answer)">Set</button>
+              </td>
+              <td>
+                <button :disabled="!answer.active" @click="setInActive(answer)">Set</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div v-else class="mb-3 col-lg-8">NO QUESTON DETAILS</div>
+      <div class="col-lg-4">
+        <label>Groups</label>
+        <button @click="saveGroup()">Save</button>
+        <table class="table table-bordered table-hover mt-2">
+          <thead>
+            <th>Pts</td>
+            <th>Name</td>
+            <th>Visible</td>
+            <th></td>
+          </thead>
+          <tbody>
+            <tr v-for="(group, index) in groups" :key="index"></th>
+              <td>{{ getPoints(index) }}</td>
+              <td @click="renameGroup(group, index)" v-if="!group.renaming">
+                {{ group.name }}
+              </td>
+              <td v-else>
+                <input type="text" v-model="group.name" @blur="renameGroup(group)" :ref="'renameInput' + index">
+              </td>
+              <td><input type="checkbox" :id="index" v-model="group.visible" /></td>
+              <td><button :disabled="group.active" @click="setGroupActive(group)"> Set Active</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Vue.js instance
+    var app = new Vue({
+      el: '#app',
+      data: {
+        questions: [],
+        groups: [],
+        activeQuestionIndex: 0,
+        socket: null
+      },
+      beforeMount() {
+        this.socket = io();
+        this.socket.on('json-data', (data) => {
+          this.activeQuestionIndex = data['active_question_index'];
+          this.questions = data['questions'];
+          this.groups = data['groups'];
+        });
+      },
+      methods: {
+        setActive(answer) {
+          answer.active = true;
+          answer.show = true;
+          answer.lock = true;
+          const activeGroupIndex = this.groups.findIndex(group => group.active === true);
+          if (activeGroupIndex !== -1) {
+            answer.group = activeGroupIndex;
+          }
+        },
+        setInActive(answer) {
+          answer.active = false;
+          answer.show = false;
+          answer.lock = false;
+          const activeGroupIndex = this.groups.findIndex(group => group.active === true);
+          if (activeGroupIndex !== -1) {
+            answer.group = null;
+          }
+        },
+        showAnswer() {
+          this.socket.emit('update-answers', {
+            questionIndex: this.activeQuestionIndex,
+            answers: this.questions[this.activeQuestionIndex]
+          });
+        },
+        saveGroup() {
+          this.socket.emit('update-groups', this.groups);
+        },
+        resetGrouptoInactive() {
+          this.groups.forEach(group => {
+            group.active = false;
+          });
+        },
+        setGroupActive(group) {
+          this.resetGrouptoInactive();
+          group.active = true;
+          this.socket.emit('update-groups', this.groups);
+        },
+        getPoints(groupIndex) {
+          let totalPoints = 0;
+          this.questions.forEach(question => {
+              question.answers.forEach(answer => {
+                  if (answer.lock && answer.group === groupIndex) {
+                      totalPoints += answer.points;
+                  }
+              });
+          });
+
+          return totalPoints;
+        },
+        gotoQuestion(index) {
+          this.activeQuestionIndex = index;
+          this.socket.emit('update-question-index', index);
+          this.resetGrouptoInactive();
+          this.socket.emit('update-groups', this.groups);
+        },
+        showNoAnswerFound() {
+          this.socket.emit('show-found-nothing');
+        },
+        showQuestion(question) {
+          question.show = true;
+        },
+        hideQuestion(question) {
+          question.show = false;
+        },
+        renameGroup(group, index = null) {
+          group.renaming = !group.renaming;
+
+          if (group.renaming && index) {
+            this.$nextTick(() => {
+              this.$refs['renameInput' + index][0].focus();
+            });
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

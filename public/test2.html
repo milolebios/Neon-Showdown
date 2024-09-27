@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Briefcase Opening Effect</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa; /* Light background */
+        }
+
+        .container {
+            position: relative;
+            width: 300px; /* Set a fixed width for the container */
+            height: 50px; /* Set a height for the container */
+            overflow: hidden; /* Hide overflow */
+            border: 2px solid #007bff; /* Optional border for effect */
+            border-radius: 5px; /* Rounded corners */
+        }
+
+        .hidden-text {
+            position: absolute;
+            left: 0; /* Start position */
+            white-space: nowrap; /* Prevent text wrapping */
+            color: white; /* Text color */
+            padding: 10px;
+            background-color: #007bff; /* Background color of the text div */
+            transition: opacity 0.2s ease; /* Transition for opacity */
+            opacity: 0; /* Initially hidden */
+        }
+
+        .drag-handle {
+            position: absolute;
+            height: 100%; /* Full height */
+            background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+            cursor: pointer; /* Change cursor to indicate draggable */
+            width: 100%; /* Full width initially */
+            left: 0; /* Start position */
+            transition: width 0.2s ease; /* Smooth transition for width */
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="dragContainer">
+        <div id="hiddenText" class="hidden-text">
+            This is the hidden text!
+        </div>
+        <div class="drag-handle" id="dragHandle"></div>
+    </div>
+
+    <script>
+        const dragHandle = document.getElementById('dragHandle');
+        const hiddenText = document.getElementById('hiddenText');
+        const dragContainer = document.getElementById('dragContainer');
+        let isDragging = false;
+        let startX;
+        let initialWidth;
+
+        dragHandle.addEventListener('mousedown', (event) => {
+            isDragging = true;
+            startX = event.clientX; // Store the starting mouse position
+            initialWidth = dragHandle.offsetWidth; // Store the initial width of the handle
+            hiddenText.style.opacity = 1; // Make text visible during drag
+        });
+
+        document.addEventListener('mousemove', (event) => {
+            if (!isDragging) return; // Only run if dragging
+            const distance = event.clientX - startX; // Calculate distance moved
+            const newWidth = initialWidth - distance; // New width of the drag handle
+
+            if (newWidth >= 0 && newWidth <= dragContainer.offsetWidth) { // Prevent moving outside container
+                dragHandle.style.width = `${newWidth}px`; // Update the handle width
+                hiddenText.style.opacity = 1 - (newWidth / initialWidth); // Adjust text visibility based on width
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false; // Stop dragging
+            hiddenText.style.opacity = 0; // Hide text again after dragging
+        });
+
+        // Prevent text from sliding when the mouse leaves the container
+        dragContainer.addEventListener('mouseleave', () => {
+            isDragging = false; // Stop dragging
+            hiddenText.style.opacity = 0; // Hide text again after dragging
+        });
+    </script>
+</body>
+</html>

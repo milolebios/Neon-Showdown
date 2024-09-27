@@ -1,0 +1,21 @@
+/* Base styles for the notification overlay */
+.notification-overlay {
+    position: fixed;            /* Position fixed to cover the entire viewport */
+    top: 0;                    /* Align to the top */
+    left: 0;                   /* Align to the left */
+    width: 100vw;              /* Full width of the viewport */
+    height: 100vh;             /* Full height of the viewport */
+    background-color: rgba(0, 0, 0, 0.5);  /* Semi-transparent background color */
+    display: flex;             /* Flexbox for centering */
+    justify-content: center;   /* Center horizontally */
+    align-items: center;       /* Center vertically */
+    backdrop-filter: blur(5px); /* Apply background blur */
+    z-index: 9999;             /* Ensure it appears above other elements */
+  }
+  
+  /* Styles for the image inside the overlay */
+  .notification-overlay img {
+    max-width: 80%;            /* Limit the max width of the image */
+    max-height: 80%;           /* Limit the max height of the image */
+    border-radius: 10px;       /* Optional: Add rounded corners */
+  }

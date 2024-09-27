@@ -1,0 +1,193 @@
+{
+    "active_question_index": 9998,
+    "questions": [
+        {
+            "question": "What's a common excuse people give for being late to work?",
+            "show": true,
+            "answers": [
+                {
+                    "text": "Overslept",
+                    "points": 30,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Personal Errand",
+                    "points": 20,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "No Internet Connection",
+                    "points": 15,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Power Interruption",
+                    "points": 10,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Windows Maintenance",
+                    "points": 5,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Traffic",
+                    "points": 2,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                }
+            ]
+        },
+        {
+            "question": "Most Common Code Review Comments:",
+            "show": true,
+            "answers": [
+                {
+                    "text": "Code Readability",
+                    "points": 40,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Avoid hardcoding values",
+                    "points": 30,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Fix naming conventions",
+                    "points": 25,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Optimize performance",
+                    "points": 20,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                }
+            ]
+        },
+        {
+            "question": "Top Japanese Words Learned by Filipino Members:",
+            "show": true,
+            "answers": [
+                {
+                    "text": "Arigatou (Thank you)",
+                    "points": 50,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Konnichiwa (Hello) ",
+                    "points": 30,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Sumimasen (Excuse me/Sorry)",
+                    "points": 20,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Ohayou (Good morning)",
+                    "points": 15,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                },
+                {
+                    "text": "Sayonara (Goodbye)",
+                    "points": 10,
+                    "show": false,
+                    "active": false,
+                    "group": null,
+                    "lock": false
+                }
+            ]
+        }
+    ],
+    "groups": [
+        {
+            "name": "Neon Pink",
+            "active": false,
+            "visible": true,
+            "points": 0,
+            "renaming": false,
+            "class": "neon-pink"
+        },
+        {
+            "name": "Electric Blue",
+            "active": false,
+            "visible": true,
+            "points": 0,
+            "renaming": false,
+            "class": "electric-blue"
+        },
+        {
+            "name": "Lime Green",
+            "active": false,
+            "visible": true,
+            "points": 0,
+            "renaming": false,
+            "class": "lime-green"
+        },
+        {
+            "name": "Neon Orange",
+            "active": false,
+            "visible": true,
+            "points": 0,
+            "renaming": false,
+            "class": "neon-orange"
+        },
+        {
+            "name": "Hot Magenta",
+            "active": false,
+            "visible": true,
+            "points": 0,
+            "renaming": false,
+            "class": "hot-magenta"
+        },
+        {
+            "name": "Cyan Glow",
+            "active": false,
+            "visible": true,
+            "points": 0,
+            "renaming": false,
+            "class": "cyan-glow"
+        }
+    ]
+}
